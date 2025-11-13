@@ -11,8 +11,7 @@ Citizen.CreateThread(function()
                     return
                 end
                 jo.framework:removeItem(_source, itemName, 1, metadata)
-                local color = Config.smokes[itemName].color
-                TriggerClientEvent("moro_smokes:setSmokeObject", _source, color)
+                TriggerClientEvent("moro_smokes:setSmokeObject", _source, itemName)
                 jo.notif.right(_source, Config.translations.smokeUsed, "hud_textures", "check", "COLOR_GREEN", 5000)
             else
                 jo.notif.right(_source, Config.translations.noSmokeItem, "hud_textures", "cross", "COLOR_RED", 5000)

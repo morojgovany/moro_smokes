@@ -1,6 +1,17 @@
 local smokers = {}
 local smokes = {}
 
+Citizen.CreateThread(function()
+    jo.framework:onCharacterSelected(function()
+        jo.async.moro_smokes.getCurrentSmokes():await(function(smokeList)
+            for _, smoke in pairs(smokeList) do
+                TriggerEvent('moro_smokes:syncSmokes', smoke.coords, smoke.itemData)
+                Wait(500)
+            end
+        end)
+    end)
+end)
+
 RegisterNetEvent('moro_smokes:setSmokeObject')
 AddEventHandler('moro_smokes:setSmokeObject', function(item)
     local playerPed = PlayerPedId()
@@ -36,8 +47,8 @@ AddEventHandler('moro_smokes:setSmokeObject', function(item)
     smokers[index] = nil
 end)
 
-RegisterNetEvent('moro_smokes:smoke_campfire_players')
-AddEventHandler('moro_smokes:smoke_campfire_players', function(coords, itemData)
+RegisterNetEvent('moro_smokes:syncSmokes')
+AddEventHandler('moro_smokes:syncSmokes', function(coords, itemData)
     RequestNamedPtfxAsset(`SCR_ADV_SOK`)
     while not HasNamedPtfxAssetLoaded(`SCR_ADV_SOK`) do
         Wait(10)
@@ -71,15 +82,4 @@ AddEventHandler('onResourceStop', function(resourceName)
             end
         end
     end
-end)
-
-Citizen.CreateThread(function()
-    jo.framework:onCharacterSelected(function()
-        jo.async.moro_smokes.getCurrentSmokes():next(function(smokeList)
-            for _, smoke in pairs(smokeList) do
-                TriggerEvent('moro_smokes:smoke_campfire_players', smoke.coords, smoke.itemData)
-                Wait(500)
-            end
-        end)
-    end)
 end)
