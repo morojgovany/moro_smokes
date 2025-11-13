@@ -17,3 +17,10 @@ Config.notifications = {
     use_smoke = "You have used a smoke item.",
     no_item = "You do not have this item.",
 }
+Config.maxSmokes = 10 -- Maximum number of simultaneous smokes allowed
+Config.maxSmokePerPlayer = 3 -- Maximum number of smokes a single player can create
+Config.translations = {
+    smokeUsed = "You have used a smoke item.",
+    maxSmokesReached = "Maximum number of smokes reached.",
+    noSmokeItem = "You do not have this item.",
+}

@@ -6,9 +6,16 @@ Citizen.CreateThread(function()
         jo.framework:registerUseItem(itemName, true, function(source, metadata)
             local _source = source
             if jo.framework:canUseItem(_source, itemName, 1, metadata, true) then
+                if #activeSmokes >= Config.maxSmokes then
+                    jo.notif.right(_source, Config.translations.maxSmokesReached, "hud_textures", "cross", "COLOR_RED", 5000)
+                    return
+                end
                 jo.framework:removeItem(_source, itemName, 1, metadata)
                 local color = Config.smokes[itemName].color
                 TriggerClientEvent("moro_smokes:setSmokeObject", _source, color)
+                jo.notif.right(_source, Config.translations.smokeUsed, "hud_textures", "check", "COLOR_GREEN", 5000)
+            else
+                jo.notif.right(_source, Config.translations.noSmokeItem, "hud_textures", "cross", "COLOR_RED", 5000)
             end
         end)
     end
