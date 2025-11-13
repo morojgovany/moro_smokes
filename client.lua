@@ -3,16 +3,31 @@ local smokes = {}
 
 RegisterNetEvent('moro_smokes:setSmokeObject')
 AddEventHandler('moro_smokes:setSmokeObject', function(item)
-    local coords = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 2.0, 0.0)
+    local playerPed = PlayerPedId()
+    local function playAnim()
+        local dict = Config.animation.dict
+        local name = Config.animation.name
+        local duration = Config.animation.duration
+        RequestAnimDict(dict)
+        while not HasAnimDictLoaded(dict) do
+            Wait(10)
+        end
+        TaskPlayAnim(PlayerPedId(), dict, name, 1.0, 1.0, duration, 1, 1.0, false, false, false)
+        RemoveAnimDict(dict)
+    end
+    local coords = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, 2.0, 0.0)
 
-    TaskStartScenarioInPlace(PlayerPedId(), `WORLD_HUMAN_CROUCH_INSPECT`, 5000, true, false, false, false)
-    Wait(5000)
+    FreezeEntityPosition(playerPed, true)
+    playAnim()
+    Wait(10000)
+    ClearPedTasks(playerPed)
+    FreezeEntityPosition(playerPed, false)
 
     local smoker = CreateObject("p_campfire01x", coords, true, true, false)
     local index = #smokers + 1
     smokers[index] = smoker
     PlaceObjectOnGroundProperly(smoker)
-    SetEntityHeading(smoker, GetEntityHeading(PlayerPedId()))
+    SetEntityHeading(smoker, GetEntityHeading(playerPed))
 
     TriggerServerEvent("moro_smokes:shareSmoke", GetEntityCoords(smoker), item)
 

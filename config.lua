@@ -13,6 +13,11 @@ Config.items = {
         color = { 255, 0, 0 }, -- RGB color for the smoke
     },
 }
+Config.animation = {
+    dict = "amb@world_human_smoking@male@male_a@base",
+    name = "base",
+    duration = 10000, -- duration in milliseconds
+}
 Config.notifications = {
     use_smoke = "You have used a smoke item.",
     no_item = "You do not have this item.",
