@@ -38,7 +38,7 @@ AddEventHandler('moro_smokes:smoke_campfire_players', function(coords, itemData)
     local index = #smokes + 1
     smokes[index] = smoke
     SetParticleFxLoopedColour(smoke, itemData.color.r, itemData.color.g, itemData.color.b, 1)
-    Wait(duration * 1000)
+    Wait(itemData.duration * 1000)
     StopParticleFxLooped(smoke, true)
     smokes[index] = nil
 end)
@@ -56,4 +56,15 @@ AddEventHandler('onResourceStop', function(resourceName)
             end
         end
     end
+end)
+
+Citizen.CreateThread(function()
+    jo.framework:onCharacterSelected(function()
+        jo.async.moro_smokes.getCurrentSmokes():next(function(smokeList)
+            for _, smoke in pairs(smokeList) do
+                TriggerEvent('moro_smokes:smoke_campfire_players', smoke.coords, smoke.itemData)
+                Wait(500)
+            end
+        end)
+    end)
 end)
