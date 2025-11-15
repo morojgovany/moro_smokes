@@ -2,7 +2,6 @@ local activeSmokes = {}
 local smokeIdCounter = 0
 
 jo.framework:onCharacterSelected(function(source)
-    print('A new player select his character', source)
     local _source = source
     local smokes = getCurrentSmokes()
     TriggerClientEvent('moro_smokes:syncSmokes', _source, smokes)
