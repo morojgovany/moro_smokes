@@ -1,11 +1,18 @@
 local activeSmokes = {}
 local smokeIdCounter = 0
 
+jo.framework:onCharacterSelected(function(source)
+    print('A new player select his character', source)
+    local _source = source
+    local smokes = getCurrentSmokes()
+    TriggerClientEvent('moro_smokes:syncSmokes', _source, smokes)
+end)
+
 Citizen.CreateThread(function()
     for itemName, itemData in pairs(Config.items) do
         jo.framework:registerUseItem(itemName, true, function(source, metadata)
             local _source = source
-            if jo.framework:canUseItem(_source, itemName, 1, metadata, true) then
+            if jo.framework:canUseItem(_source, itemName, 1, nil, true) then
                 if #activeSmokes >= Config.maxSmokes then
                     jo.notif.right(_source, Config.translations.maxSmokesReached, "hud_textures", "cross", "COLOR_RED", 5000)
                     return
@@ -27,15 +34,10 @@ AddEventHandler("moro_smokes:shareSmoke", function(coords, item)
     end
 
     local itemData = Config.items[item]
-    local color = itemData.color
     local syncedItemData = {
         duration = itemData.duration,
         scale = itemData.scale,
-        color = {
-            r = (color[1] or 0.0) * 1.0,
-            g = (color[2] or 0.0) * 1.0,
-            b = (color[3] or 0.0) * 1.0
-        }
+        color = itemData.color
     }
 
     smokeIdCounter = smokeIdCounter + 1
@@ -53,7 +55,7 @@ AddEventHandler("moro_smokes:shareSmoke", function(coords, item)
         activeSmokes[smokeId] = nil
     end)
 
-    TriggerClientEvent("moro_smokes:syncSmokes", -1, coords, syncedItemData)
+    TriggerClientEvent("moro_smokes:syncSmoke", -1, coords, syncedItemData)
 end)
 
 function getCurrentSmokes()

@@ -1,17 +1,6 @@
 local smokers = {}
 local smokes = {}
 
-Citizen.CreateThread(function()
-    jo.framework:onCharacterSelected(function()
-        jo.async.moro_smokes.getCurrentSmokes():await(function(smokeList)
-            for _, smoke in pairs(smokeList) do
-                TriggerEvent('moro_smokes:syncSmokes', smoke.coords, smoke.itemData)
-                Wait(500)
-            end
-        end)
-    end)
-end)
-
 RegisterNetEvent('moro_smokes:setSmokeObject')
 AddEventHandler('moro_smokes:setSmokeObject', function(item)
     local playerPed = PlayerPedId()
@@ -26,19 +15,24 @@ AddEventHandler('moro_smokes:setSmokeObject', function(item)
         TaskPlayAnim(PlayerPedId(), dict, name, 1.0, 1.0, duration, 1, 1.0, false, false, false)
         RemoveAnimDict(dict)
     end
-    local coords = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, 2.0, 0.0)
+    local coords = GetOffsetFromEntityInWorldCoords(playerPed, Config.items[item].offset.x, Config.items[item].offset.y, Config.items[item].offset.z)
 
     FreezeEntityPosition(playerPed, true)
     playAnim()
-    Wait(10000)
-    ClearPedTasks(playerPed)
-    FreezeEntityPosition(playerPed, false)
-
-    local smoker = CreateObject("p_campfire01x", coords, true, true, false)
-    local index = #smokers + 1
-    smokers[index] = smoker
+    Wait(Config.animation.duration * 0.4)
+    local smoker = CreateObjectNoOffset(Config.items[item].model, coords, true, false, true)
     PlaceObjectOnGroundProperly(smoker)
     SetEntityHeading(smoker, GetEntityHeading(playerPed))
+    SetEntityInvincible(smoker, true)
+    SetEntityRotation(smoker, Config.items[item].rotation.x, Config.items[item].rotation.y, Config.items[item].rotation.z, 2)
+    SetEntityCollision(smoker, false, true)
+    SetEntityVisible(smoker, true)
+    FreezeEntityPosition(smoker, true)
+    local index = #smokers + 1
+    smokers[index] = smoker
+    Wait(Config.animation.duration * 0.35)
+    ClearPedTasks(playerPed)
+    FreezeEntityPosition(playerPed, false)
 
     TriggerServerEvent("moro_smokes:shareSmoke", GetEntityCoords(smoker), item)
 
@@ -47,11 +41,11 @@ AddEventHandler('moro_smokes:setSmokeObject', function(item)
     smokers[index] = nil
 end)
 
-RegisterNetEvent('moro_smokes:syncSmokes')
-AddEventHandler('moro_smokes:syncSmokes', function(coords, itemData)
+RegisterNetEvent('moro_smokes:syncSmoke')
+AddEventHandler('moro_smokes:syncSmoke', function(coords, itemData)
     RequestNamedPtfxAsset(`SCR_ADV_SOK`)
     while not HasNamedPtfxAssetLoaded(`SCR_ADV_SOK`) do
-        Wait(10)
+        Wait(20)
     end
 
     UseParticleFxAsset("SCR_ADV_SOK")
@@ -60,13 +54,21 @@ AddEventHandler('moro_smokes:syncSmokes', function(coords, itemData)
         local newZ = ground - 1.0
         coords = vector3(coords.x, coords.y, newZ)
     end
-    local smoke = StartParticleFxLoopedAtCoord("scr_adv_sok_torchsmoke", coords.x, coords.y, coords.z - 6.5, 0.0, 0.0, 0.0, itemData.scale, false, false, false, true)
+    local smoke = StartParticleFxLoopedAtCoord("scr_adv_sok_torchsmoke", coords.x, coords.y, (coords.z - itemData.scale), 0.0, 0.0, 0.0, itemData.scale, false, false, false, true)
     local index = #smokes + 1
     smokes[index] = smoke
-    SetParticleFxLoopedColour(smoke, itemData.color.r, itemData.color.g, itemData.color.b, 1)
+    SetParticleFxLoopedColour(smoke, itemData.color.r + 0.0, itemData.color.g + 0.0, itemData.color.b + 0.0, 1)
     Wait(itemData.duration * 1000)
     StopParticleFxLooped(smoke, true)
     smokes[index] = nil
+end)
+
+RegisterNetEvent('moro_smokes:syncSmokes')
+AddEventHandler('moro_smokes:syncSmokes', function(allSmokes)
+    for i, smokeData in pairs(allSmokes) do
+        TriggerEvent('moro_smokes:syncSmoke', smokeData.coords, smokeData.itemData)
+        Wait(500)
+    end
 end)
 
 AddEventHandler('onResourceStop', function(resourceName)
@@ -81,5 +83,6 @@ AddEventHandler('onResourceStop', function(resourceName)
                 StopParticleFxLooped(smoke, true)
             end
         end
+        ClearPedTasks(PlayerPedId())
     end
 end)

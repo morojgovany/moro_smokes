@@ -1,21 +1,46 @@
 Config = {}
 Config.items = {
-    big_red_smoke = {
-        label = "Big Smoke",
-        duration = 60, -- duration in seconds
-        scale = 8.0,
-        color = {255, 0, 0}, -- RGB color for the smoke
+    big_red_smoke = { -- item name
+        label = "Big red smoke",
+        duration = 960, -- duration in seconds
+        scale = 4.0, -- scale of the smoke effect
+        color = { r = 255, g = 0, b = 0}, -- RGB color for the smoke | TIP : if you set more than 1 color, it may not work (white smoke) try to use values like this example: orange = 255.0, 0.5, 0.0
+        model = `s_dynamitehusk01x`, -- item model to spawn
+        rotation = { x = -90.0, y = 0.0, z = 0.0 }, -- rotation of the spawned item
+        offset = { x = 0.1, y = 0.5, z = 0.0 }, -- offset of the spawned item
+
     },
-    small_red_smoke = {
-        label = "Small Smoke",
+    big_blue_smoke = { -- item name
+        label = "Big blue smoke",
+        duration = 960, -- duration in seconds
+        scale = 4.0, -- scale of the smoke effect
+        color = { r = 0, g = 0, b = 255 } , -- RGB color for the smoke | TIP : if you set more than 1 color, it may not work (white smoke) try to use values like this example: orange = 255.0, 0.5, 0.0
+        model = `s_dynamitehusk01x`, -- item model to spawn
+        rotation = { x = -90.0, y = 0.0, z = 0.0 }, -- rotation of the spawned item
+        offset = { x = 0.1, y = 0.5, z = 0.0 }, -- offset of the spawned item
+    },
+    big_green_smoke = { -- item name
+        label = "Big green smoke",
+        duration = 60, -- duration in seconds
+        scale = 4.0, -- scale of the smoke effect
+        color = {r = 0, g = 255, b = 0}, -- RGB color for the smoke | TIP : if you set more than 1 color, it may not work (white smoke) try to use values like this example: orange = 255.0, 0.5, 0.0
+        model = `s_dynamitehusk01x`, -- item model to spawn
+        rotation = { x = -90.0, y = 0.0, z = 0.0 }, -- rotation of the spawned item
+        offset = { x = 0.1, y = 0.5, z = 0.0 }, -- offset of the spawned item
+    },
+    small_red_smoke = { -- item name
+        label = "Small red smoke",
         duration = 30, -- duration in seconds
-        scale = 4.0,
-        color = { 255, 0, 0 }, -- RGB color for the smoke
+        scale = 1.0, -- scale of the smoke effect
+        color = { r = 255, g = 0, b = 0 }, -- RGB color for the smoke | TIP : if you set more than 1 color, it may not work (white smoke) try to use values like this example: orange = 255.0, 0.5, 0.0
+        model = `s_dynamitehusk01x`, -- item model to spawn
+        rotation = { x = -90.0, y = 0.0, z = 0.0 }, -- rotation of the spawned item
+        offset = { x = 0.1, y = 0.5, z = 0.0 }, -- offset of the spawned item
     },
 }
 Config.animation = {
-    dict = "amb@world_human_smoking@male@male_a@base",
-    name = "base",
+    dict = 'amb_camp@world_camp_jack_plant@idle_a',
+    name = 'idle_a',
     duration = 10000, -- duration in milliseconds
 }
 Config.notifications = {
