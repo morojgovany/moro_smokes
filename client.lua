@@ -57,7 +57,18 @@ AddEventHandler('moro_smokes:syncSmoke', function(coords, itemData)
     local smoke = StartParticleFxLoopedAtCoord("scr_adv_sok_torchsmoke", coords.x, coords.y, (coords.z - itemData.scale), 0.0, 0.0, 0.0, itemData.scale, false, false, false, true)
     local index = #smokes + 1
     smokes[index] = smoke
-    SetParticleFxLoopedColour(smoke, itemData.color.r + 0.0, itemData.color.g + 0.0, itemData.color.b + 0.0, 1)
+    local function normalizeColorValue(value)
+        value = value or 0
+        return math.min(value / 255.0, 1.0)
+    end
+
+    SetParticleFxLoopedColour(
+        smoke,
+        normalizeColorValue(itemData.color.r),
+        normalizeColorValue(itemData.color.g),
+        normalizeColorValue(itemData.color.b),
+        1
+    )
     Wait(itemData.duration * 1000)
     StopParticleFxLooped(smoke, true)
     smokes[index] = nil
