@@ -1,5 +1,38 @@
 local activeSmokes = {}
 local smokeIdCounter = 0
+local playerSmokeCount = {}
+
+local function getPlayerSmokeCount(source)
+    return playerSmokeCount[source] or 0
+end
+
+local function incrementPlayerSmokeCount(source)
+    playerSmokeCount[source] = getPlayerSmokeCount(source) + 1
+end
+
+local function decrementPlayerSmokeCount(source)
+    if not playerSmokeCount[source] then
+        return
+    end
+
+    playerSmokeCount[source] = math.max(playerSmokeCount[source] - 1, 0)
+
+    if playerSmokeCount[source] == 0 then
+        playerSmokeCount[source] = nil
+    end
+end
+
+local function removeActiveSmoke(smokeId)
+    local smoke = activeSmokes[smokeId]
+    if not smoke then
+        return
+    end
+
+    activeSmokes[smokeId] = nil
+    if smoke.owner then
+        decrementPlayerSmokeCount(smoke.owner)
+    end
+end
 
 jo.framework:onCharacterSelected(function(source)
     local _source = source
@@ -14,6 +47,10 @@ Citizen.CreateThread(function()
             if jo.framework:canUseItem(_source, itemName, 1, nil, true) then
                 if #activeSmokes >= Config.maxSmokes then
                     jo.notif.right(_source, Config.translations.maxSmokesReached, "hud_textures", "cross", "COLOR_RED", 5000)
+                    return
+                end
+                if getPlayerSmokeCount(_source) >= Config.maxSmokePerPlayer then
+                    jo.notif.right(_source, Config.translations.maxPlayerSmokesReached, "hud_textures", "cross", "COLOR_RED", 5000)
                     return
                 end
                 jo.framework:removeItem(_source, itemName, 1, metadata)
@@ -32,6 +69,12 @@ AddEventHandler("moro_smokes:shareSmoke", function(coords, item)
         return
     end
 
+    local _source = source
+    if getPlayerSmokeCount(_source) >= Config.maxSmokePerPlayer then
+        jo.notif.right(_source, Config.translations.maxPlayerSmokesReached, "hud_textures", "cross", "COLOR_RED", 5000)
+        return
+    end
+
     local itemData = Config.items[item]
     local syncedItemData = {
         duration = itemData.duration,
@@ -44,14 +87,17 @@ AddEventHandler("moro_smokes:shareSmoke", function(coords, item)
     local expiresAt = GetGameTimer() + (syncedItemData.duration * 1000)
     local coordsData = { x = coords.x, y = coords.y, z = coords.z }
 
+    incrementPlayerSmokeCount(_source)
+
     activeSmokes[smokeId] = {
         coords = coordsData,
         itemData = syncedItemData,
-        expiresAt = expiresAt
+        expiresAt = expiresAt,
+        owner = _source
     }
 
     Citizen.SetTimeout(syncedItemData.duration * 1000, function()
-        activeSmokes[smokeId] = nil
+        removeActiveSmoke(smokeId)
     end)
 
     TriggerClientEvent("moro_smokes:syncSmoke", -1, coords, syncedItemData)
@@ -65,7 +111,7 @@ function getCurrentSmokes()
         local remainingMs = (smoke.expiresAt or 0) - now
 
         if remainingMs <= 0 then
-            activeSmokes[smokeId] = nil
+            removeActiveSmoke(smokeId)
         else
             table.insert(smokeList, {
                 coords = smoke.coords,
@@ -80,3 +126,7 @@ function getCurrentSmokes()
 
     return smokeList
 end
+
+AddEventHandler('playerDropped', function()
+    playerSmokeCount[source] = nil
+end)

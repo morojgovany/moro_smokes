@@ -173,5 +173,6 @@ Config.maxSmokePerPlayer = 3 -- Maximum number of smokes a single player can cre
 Config.translations = {
     smokeUsed = "You have used a smoke item.",
     maxSmokesReached = "Maximum number of smokes reached.",
+    maxPlayerSmokesReached = "You have reached the maximum number of personal smokes.",
     noSmokeItem = "You do not have this item.",
 }
