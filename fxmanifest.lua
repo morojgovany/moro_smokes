@@ -25,5 +25,4 @@ dependencies {
 jo_libs {
     'framework',
     'notification',
-    "callback",
 }
