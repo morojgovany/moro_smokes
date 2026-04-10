@@ -44,7 +44,7 @@ Citizen.CreateThread(function()
     for itemName, itemData in pairs(Config.items) do
         jo.framework:registerUseItem(itemName, true, function(source, metadata)
             local _source = source
-            if jo.framework:canUseItem(_source, itemName, 1, nil, true) then
+            if jo.framework:canUseItem(_source, itemName, 1, nil, false) then
                 if #activeSmokes >= Config.maxSmokes then
                     jo.notif.right(_source, Config.translations.maxSmokesReached, "hud_textures", "cross", "COLOR_RED", 5000)
                     return
